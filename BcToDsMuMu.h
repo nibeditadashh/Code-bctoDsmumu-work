@@ -210,7 +210,7 @@ private:
   
   std::vector<float>       *B_mass, *B_px, *B_py, *B_pz;
  
-  //std::vector<float>       *B_Ds_mass, *B_Ds_px, *B_Ds_py, *B_Ds_pz;
+  std::vector<float>       *B_Ds_mass, *B_Ds_px, *B_Ds_py, *B_Ds_pz;
   std::vector<float>       *B_Ds_pt1, *B_Ds_px1, *B_Ds_py1, *B_Ds_pz1;
   std::vector<float>       *B_Ds_pt2, *B_Ds_px2, *B_Ds_py2, *B_Ds_pz2;
   std::vector<float>       *B_Ds_pt3, *B_Ds_px3, *B_Ds_py3, *B_Ds_pz3;
@@ -230,12 +230,7 @@ private:
   
   std::vector<float>       *B_Ds_chi2, *B_mumu_chi2, *B_chi2, *B_chi2dof;
   std::vector<float>       *B_Prob, *B_mumu_Prob, *B_Ds_Prob;
-// ------------
-  std::vector<float>       *B_Phi_mass; //*B_Ds_px, *B_Ds_py, *B_Ds_pz;
-  std::vector<float>       *B_Ds_mass; //*B_Ds_px, *B_Ds_py, *B_Ds_pz;
-  std::vector<float>       *Ds_pt;
-  std::vector<float>       *pion_pt;
-// ------------
+
 
   std::vector<float>       *bDecayVtxX, *bDecayVtxY, *bDecayVtxZ;
   std::vector<double>      *bDecayVtxXE, *bDecayVtxYE, *bDecayVtxZE;
@@ -266,7 +261,7 @@ private:
   int  run, event;
   int  lumiblock;
 
-  TLorentzVector gen_b_p4,gen_ks_p4,gen_pion1_p4,gen_pion2_p4,gen_jpsi_p4,gen_muon1_p4,gen_muon2_p4,gen_pion3_p4,gen_ds_p4;
+  TLorentzVector gen_b_p4,gen_ks_p4,gen_pion1_p4,gen_pion2_p4,gen_pion3_p4,gen_jpsi_p4,gen_muon1_p4,gen_muon2_p4,gen_ds_p4;
   TVector3       gen_b_vtx,gen_jpsi_vtx,gen_ds_vtx;
   float          gen_b_ct;
 
