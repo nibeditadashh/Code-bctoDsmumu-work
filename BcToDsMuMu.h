@@ -256,7 +256,7 @@ private:
   std::vector<float>       *B_l3d_pv2,  *B_l3dE_pv2;
   std::vector<float>       *B_iso, *B_mum_iso, *B_mup_iso, *B_pi1_iso, *B_pi2_iso;
 
-  std::vector<bool>        *istruemum, *istruemup, *istruekp, *istruekm, *istruebs;
+  std::vector<bool>        *istruemum, *istruemup, *istruekp, *istruekm, *istruekmm,  *istruebs;
   std::vector<float>       *bunchXingMC, *numInteractionsMC, *trueNumInteractionsMC;  
   int  run, event;
   int  lumiblock;

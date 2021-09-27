@@ -208,7 +208,7 @@ BcToDsMuMu::BcToDsMuMu(const edm::ParameterSet& iConfig):
   B_l3d_pv2(0),  B_l3dE_pv2(0),
   B_iso(0), B_mum_iso(0), B_mup_iso(0), B_pi1_iso(0),B_pi2_iso(0),
   
-  istruemum(0), istruemup(0), istruekp(0), istruekm(0), istruebs(0),
+  istruemum(0), istruemup(0), istruekp(0), istruekm(0), istruekmm(0), istruebs(0),
   bunchXingMC(0), numInteractionsMC(0), trueNumInteractionsMC(0),
   run(0), event(0),
   lumiblock(0)
@@ -288,22 +288,22 @@ void BcToDsMuMu::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
     for (size_t i=0; i<pruned->size(); i++) {
       foundit = 0;
       const reco::Candidate *dau = &(*pruned)[i];
-      if ( (abs(dau->pdgId()) == 541)   && (dau->status() == 3) ) {
-std::cout << "Bc Candidate "<< dau->pdgId() << std::endl; 
+      if ( (abs(dau->pdgId()) == 541)){ //   && (dau->status() == 3) ) {
+//std::cout << "Bc Candidate "<< dau->pdgId() << std::endl; 
         foundit++;
         gen_b_p4.SetPtEtaPhiM(dau->pt(),dau->eta(),dau->phi(),dau->mass());
         gen_b_vtx.SetXYZ(dau->vx(),dau->vy(),dau->vz());
         for (size_t k=0; k<dau->numberOfDaughters(); k++) {
           const reco::Candidate *gdau = dau->daughter(k);
           if (gdau->pdgId()==431 ) {
-std::cout << "Ds Candidate "<< gdau->pdgId() << std::endl;
+//std::cout << "Ds Candidate "<< gdau->pdgId() << std::endl;
             foundit++;
             gen_jpsi_vtx.SetXYZ(gdau->vx(),gdau->vy(),gdau->vz());
 
             int nm=0;
             for (size_t l=0; l<gdau->numberOfDaughters(); l++) {
               const reco::Candidate *mm = gdau->daughter(l);
-if (mm->pdgId()==321) { foundit++;
+		if (mm->pdgId()==321) { foundit++;
                 if (mm->status()!=1) {
                   for (size_t m=0; m<mm->numberOfDaughters(); m++) {
                     const reco::Candidate *mu = mm->daughter(m);
@@ -351,12 +351,12 @@ if (mm->pdgId()==321) { foundit++;
       } // Ds Daughters
 }// Ds
  	if (gdau->pdgId()==13 ) {
-std::cout << "mu1 Candidate "<< gdau->pdgId() << std::endl;
+//std::cout << "mu1 Candidate "<< gdau->pdgId() << std::endl;
             foundit++;
             gen_muon1_p4.SetPtEtaPhiM(gdau->pt(),gdau->eta(),gdau->phi(),gdau->mass());
 		}
 	if (gdau->pdgId()==-13 ) {
-std::cout << "mu2 Candidate "<< gdau->pdgId() << std::endl;
+//std::cout << "mu2 Candidate "<< gdau->pdgId() << std::endl;
             foundit++;
             gen_muon2_p4.SetPtEtaPhiM(gdau->pt(),gdau->eta(),gdau->phi(),gdau->mass());
 		}
@@ -518,9 +518,9 @@ std::cout << "mu2 Candidate "<< gdau->pdgId() << std::endl;
 	      continue;
 	    }
 	  
-	  if(iMuon1->track()->pt()<4.0) continue;
+	  if(iMuon1->track()->pt()<2.0) continue;
 	  //if(iMuon1->track()->pt()<2.0) continue;
-	  if(iMuon2->track()->pt()<4.0) continue;
+	  if(iMuon2->track()->pt()<2.0) continue;
 	  //if(iMuon2->track()->pt()<2.0) continue;
 	  
 	  if(!(glbTrackM->quality(reco::TrackBase::highPurity))) continue;
@@ -614,7 +614,7 @@ std::cout << "mu2 Candidate "<< gdau->pdgId() << std::endl;
 	  for(ix = 0; (unsigned)ix<thePATTrackHandle->size(); ix++){
 	    pat::PackedCandidate trackView((*thePATTrackHandle)[ix]);
 	    if(trackView.charge()==0) continue;  
-	    if(trackView.pt()<1.0) continue;  
+	   // if(trackView.pt()<1.0) continue;  
 	    if( !(trackView.hasTrackDetails())) continue;
 	    if(!(trackView.bestTrack()->quality(reco::Track::highPurity))) continue; 
 	    if ( IsTheSamePFtk(trackView,*iMuon1) || IsTheSamePFtk(trackView,*iMuon2) ) continue;
@@ -1144,7 +1144,7 @@ std::cout << "mu2 Candidate "<< gdau->pdgId() << std::endl;
   B_l3d_pv2->clear();  B_l3dE_pv2->clear();
   B_iso->clear(); B_mum_iso->clear(); B_mup_iso->clear(); B_pi1_iso->clear();B_pi2_iso->clear();
   
-  istruemum->clear(); istruemup->clear(); istruekp->clear(); istruekm->clear(); istruebs->clear();
+  istruemum->clear(); istruemup->clear(); istruekp->clear(); istruekm->clear(); istruekmm->clear(); istruebs->clear();
   bunchXingMC->clear(); numInteractionsMC->clear(); trueNumInteractionsMC->clear();
   
   
@@ -1269,11 +1269,24 @@ BcToDsMuMu::saveTruthMatch(const edm::Event& iEvent){
       istruekm->push_back(false);
     }
 
+	//---------------------------------
+	//truth match with 3 pion track
+	//---------------------------------
+	
+	 deltaEtaPhi = calEtaPhiDistance(gen_pion3_p4.Px(), gen_pion3_p4.Py(), gen_pion3_p4.Pz(),
+                                    B_Ds_px3->at(i), B_Ds_py3->at(i), B_Ds_pz3->at(i));
+    if (deltaEtaPhi < TruthMatchKaonMaxR_){
+      istruekmm->push_back(true);
+    } else {
+      istruekmm->push_back(false);
+    }
+
+
 
     //---------------------------------------
     // truth match with Bs or Bs bar 
     //---------------------------------------                                                                                                
-    if ( istruemum->back() && istruemup->back() && istruekm->back() && istruekp->back() ) {
+    if ( istruemum->back() && istruemup->back() && istruekm->back() && istruekmm->back() && istruekp->back() ) {
       istruebs->push_back(true);
     } else {
       istruebs->push_back(false);
@@ -1885,6 +1898,7 @@ BcToDsMuMu::beginJob()
     tree_->Branch("gen_ks_p4",   "TLorentzVector",  &gen_ks_p4);
     tree_->Branch("gen_pion1_p4",  "TLorentzVector",  &gen_pion1_p4);
     tree_->Branch("gen_pion2_p4",  "TLorentzVector",  &gen_pion2_p4);
+    tree_->Branch("gen_pion3_p4",  "TLorentzVector",  &gen_pion3_p4);
     tree_->Branch("gen_jpsi_p4",   "TLorentzVector",  &gen_jpsi_p4);
     tree_->Branch("gen_muon1_p4",  "TLorentzVector",  &gen_muon1_p4);
     tree_->Branch("gen_muon2_p4",  "TLorentzVector",  &gen_muon2_p4);
@@ -1896,6 +1910,7 @@ BcToDsMuMu::beginJob()
   tree_->Branch("istruemup",  &istruemup );
   tree_->Branch("istruekp",   &istruekp  );
   tree_->Branch("istruekm",   &istruekm  );
+  tree_->Branch("istruekmm",   &istruekmm  );
   tree_->Branch("istruebs",   &istruebs  );
   
   tree_->Branch("bunchXingMC",&bunchXingMC);
